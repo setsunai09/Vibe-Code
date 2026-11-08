@@ -3,7 +3,7 @@ const ctx = canvas.getContext("2d");
 
 /* ---- Constants ---- */
 const CANVAS_DISPLAY_SIZE = 512;
-const RESOLUTIONS = [16, 32, 64];
+const RESOLUTIONS = [8, 16, 24, 32, 48, 64, 96, 128];
 
 /* ---- State ---- */
 let resolution = 32;
