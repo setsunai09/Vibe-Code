@@ -3,60 +3,52 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Мой сайт</title>
+  <title>Pixel Art Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <header class="header">
-    <div class="container">
-      <div class="header__inner">
-        <a href="index.html" class="logo">Logo</a>
-        <nav class="nav">
-          <ul class="nav__list">
-            <li class="nav__item"><a href="#" class="nav__link">Главная</a></li>
-            <li class="nav__item"><a href="#" class="nav__link">О нас</a></li>
-            <li class="nav__item"><a href="#" class="nav__link">Услуги</a></li>
-            <li class="nav__item"><a href="#" class="nav__link">Контакты</a></li>
-          </ul>
-        </nav>
-      </div>
-    </div>
+    <h1 class="header__title">Pixel Art Studio</h1>
   </header>
 
-  <main>
-    <section class="hero">
-      <div class="container">
-        <h1 class="hero__title">Добро пожаловать</h1>
-        <p class="hero__subtitle">Краткое описание вашего проекта или услуги</p>
+  <div class="layout">
+    <aside class="toolbar">
+      <div class="toolbar__section">
+        <h3 class="toolbar__label">Кисть</h3>
+        <button class="tool-btn tool-btn--active" data-tool="brush">🖌 Кисть</button>
+        <button class="tool-btn" data-tool="eraser">🧹 Ластик</button>
       </div>
-    </section>
 
-    <section class="features">
-      <div class="container">
-        <h2 class="section-title">Преимущества</h2>
-        <div class="features__grid">
-          <div class="feature-card">
-            <h3 class="feature-card__title">Быстро</h3>
-            <p class="feature-card__text">Описание преимущества</p>
-          </div>
-          <div class="feature-card">
-            <h3 class="feature-card__title">Надёжно</h3>
-            <p class="feature-card__text">Описание преимущества</p>
-          </div>
-          <div class="feature-card">
-            <h3 class="feature-card__title">Удобно</h3>
-            <p class="feature-card__text">Описание преимущества</p>
-          </div>
+      <div class="toolbar__section">
+        <h3 class="toolbar__label">Размер кисти</h3>
+        <input type="range" class="brush-size" min="1" max="20" value="3">
+        <span class="brush-size-value">3</span>
+      </div>
+
+      <div class="toolbar__section">
+        <h3 class="toolbar__label">Палитра</h3>
+        <div class="palette">
+          <button class="color-swatch color-swatch--active" data-color="#000000" style="background:#000000"></button>
+          <button class="color-swatch" data-color="#ff4d8d" style="background:#ff4d8d"></button>
+          <button class="color-swatch" data-color="#ff85b8" style="background:#ff85b8"></button>
+          <button class="color-swatch" data-color="#ffb3d1" style="background:#ffb3d1"></button>
+          <button class="color-swatch" data-color="#a855f7" style="background:#a855f7"></button>
+          <button class="color-swatch" data-color="#3b82f6" style="background:#3b82f6"></button>
         </div>
       </div>
-    </section>
-  </main>
 
-  <footer class="footer">
-    <div class="container">
-      <p>&copy; 2026 Мой сайт. Все права защищены.</p>
-    </div>
-  </footer>
+      <div class="toolbar__section toolbar__section--bottom">
+        <button class="action-btn action-btn--clear" id="clearBtn">🗑 Очистить всё</button>
+        <button class="action-btn action-btn--download" id="downloadBtn">💾 Скачать</button>
+      </div>
+    </aside>
+
+    <main class="canvas-area">
+      <canvas id="drawingCanvas"></canvas>
+    </main>
+  </div>
 
   <script src="js/app.js"></script>
 </body>
