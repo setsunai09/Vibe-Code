@@ -14,6 +14,8 @@ let currentColor = "#000000";
 let brushSize = 1;
 let lastGridX = -1;
 let lastGridY = -1;
+let history = [];
+const MAX_HISTORY = 30;
 
 /* ---- Canvas setup ---- */
 canvas.width = CANVAS_DISPLAY_SIZE;
@@ -84,9 +86,10 @@ function drawLineBetween(x0, y0, x1, y1) {
   }
 }
 
-/* ---- Drawing handlers ---- */
+/* ---- Drawing helpers ---- */
 function startDraw(e) {
   drawing = true;
+  saveState();
   const rect = canvas.getBoundingClientRect();
   const x = e.clientX - rect.left;
   const y = e.clientY - rect.top;
@@ -152,6 +155,21 @@ function loadCanvas(res) {
   img.src = data;
 }
 
+/* ---- Undo History ---- */
+function saveState() {
+  history.push(ctx.getImageData(0, 0, CANVAS_DISPLAY_SIZE, CANVAS_DISPLAY_SIZE));
+  if (history.length > MAX_HISTORY) {
+    history.shift();
+  }
+}
+
+function undo() {
+  if (history.length === 0) return;
+  const state = history.pop();
+  ctx.putImageData(state, 0, 0);
+  saveCanvas();
+}
+
 /* ---- Resolution change ---- */
 function setResolution(newRes) {
   /* Save current resolution's canvas before switching */
@@ -205,6 +223,17 @@ toolBtns.forEach((btn) => {
     btn.classList.add("tool-btn--active");
     currentTool = btn.dataset.tool;
   });
+});
+
+/* ---- Undo ---- */
+document.getElementById("undoBtn").addEventListener("click", undo);
+
+/* ---- Keyboard shortcut: Ctrl+Z ---- */
+document.addEventListener("keydown", (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key === "z") {
+    e.preventDefault();
+    undo();
+  }
 });
 
 /* ---- Clear Canvas ---- */
