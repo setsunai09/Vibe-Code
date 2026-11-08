@@ -136,6 +136,7 @@ function drawGrid() {
 function saveCanvas() {
   try {
     localStorage.setItem("pixelArtCanvas_" + resolution, canvas.toDataURL("image/png"));
+    localStorage.setItem("pixelArtResolution", resolution);
   } catch (e) {
     /* localStorage is full or disabled */
   }
@@ -228,6 +229,12 @@ canvas.addEventListener("mouseup", stopDraw);
 canvas.addEventListener("mouseleave", stopDraw);
 
 /* ---- Init ---- */
+const savedRes = parseInt(localStorage.getItem("pixelArtResolution"), 10);
+if (savedRes && RESOLUTIONS.includes(savedRes)) {
+  resolution = savedRes;
+  resolutionSelect.value = resolution;
+}
+
+pixelSize = CANVAS_DISPLAY_SIZE / resolution;
 drawGrid();
 loadCanvas(resolution);
-resolutionSelect.value = resolution;
