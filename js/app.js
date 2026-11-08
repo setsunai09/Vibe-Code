@@ -132,8 +132,30 @@ function drawGrid() {
   ctx.stroke();
 }
 
+/* ---- Save / Load ---- */
+function saveCanvas() {
+  try {
+    localStorage.setItem("pixelArtCanvas_" + resolution, canvas.toDataURL("image/png"));
+  } catch (e) {
+    /* localStorage is full or disabled */
+  }
+}
+
+function loadCanvas(res) {
+  const data = localStorage.getItem("pixelArtCanvas_" + res);
+  if (!data) return;
+  const img = new Image();
+  img.onload = () => {
+    ctx.drawImage(img, 0, 0);
+  };
+  img.src = data;
+}
+
 /* ---- Resolution change ---- */
 function setResolution(newRes) {
+  /* Save current resolution's canvas before switching */
+  saveCanvas();
+
   resolution = newRes;
   pixelSize = CANVAS_DISPLAY_SIZE / resolution;
   canvas.width = CANVAS_DISPLAY_SIZE;
@@ -141,25 +163,9 @@ function setResolution(newRes) {
   ctx.imageSmoothingEnabled = false;
   ctx.clearRect(0, 0, CANVAS_DISPLAY_SIZE, CANVAS_DISPLAY_SIZE);
   drawGrid();
-}
 
-/* ---- Save / Load ---- */
-function saveCanvas() {
-  try {
-    localStorage.setItem("pixelArtCanvas", canvas.toDataURL("image/png"));
-  } catch (e) {
-    /* localStorage is full or disabled */
-  }
-}
-
-function loadCanvas() {
-  const data = localStorage.getItem("pixelArtCanvas");
-  if (!data) return;
-  const img = new Image();
-  img.onload = () => {
-    ctx.drawImage(img, 0, 0);
-  };
-  img.src = data;
+  /* Load the new resolution's canvas */
+  loadCanvas(resolution);
 }
 
 /* ---- Palette ---- */
@@ -223,4 +229,5 @@ canvas.addEventListener("mouseleave", stopDraw);
 
 /* ---- Init ---- */
 drawGrid();
-loadCanvas();
+loadCanvas(resolution);
+resolutionSelect.value = resolution;
