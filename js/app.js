@@ -24,6 +24,10 @@ canvas.height = CANVAS_DISPLAY_SIZE;
 canvas.style.width = CANVAS_DISPLAY_SIZE + "px";
 canvas.style.height = CANVAS_DISPLAY_SIZE + "px";
 
+/* ---- White background ---- */
+ctx.fillStyle = "#FFFFFF";
+ctx.fillRect(0, 0, canvas.width, canvas.height);
+
 /* ---- Grid snapping ---- */
 function snapToGrid(x, y) {
   const gridX = Math.floor(x / pixelSize);
@@ -52,6 +56,7 @@ function fillCell(gridX, gridY) {
 
 /* ---- Draw brush area (square around cursor) ---- */
 function drawBrushAt(gridX, gridY) {
+  if (currentTool === "fill") return;
   const half = Math.floor(brushSize / 2);
   for (let dy = -half; dy <= half; dy++) {
     for (let dx = -half; dx <= half; dx++) {
@@ -64,72 +69,64 @@ function drawBrushAt(gridX, gridY) {
   }
 }
 
-/* ---- Flood Fill ---- */
-function hexToRGBA(hex) {
-  const r = parseInt(hex.slice(1, 3), 16);
-  const g = parseInt(hex.slice(3, 5), 16);
-  const b = parseInt(hex.slice(5, 7), 16);
-  return [r, g, b, 255];
+/* ---- Flood Fill (grid-level) ---- */
+function isColorMatch(c1, c2) {
+  const tolerance = 10;
+  return Math.abs(c1[0] - c2[0]) <= tolerance &&
+         Math.abs(c1[1] - c2[1]) <= tolerance &&
+         Math.abs(c1[2] - c2[2]) <= tolerance &&
+         Math.abs(c1[3] - c2[3]) <= tolerance;
 }
 
 function floodFill(startGridX, startGridY) {
-  const imageData = ctx.getImageData(0, 0, CANVAS_DISPLAY_SIZE, CANVAS_DISPLAY_SIZE);
+  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
   const data = imageData.data;
 
-  const targetColor = hexToRGBA(currentColor);
+  const startX = (startGridX * pixelSize) + (pixelSize / 2);
+  const startY = (startGridY * pixelSize) + (pixelSize / 2);
+  const startIdx = (Math.floor(startY) * canvas.width + Math.floor(startX)) * 4;
 
-  const startX = startGridX * pixelSize + Math.floor(pixelSize / 2);
-  const startY = startGridY * pixelSize + Math.floor(pixelSize / 2);
+  const targetColor = [data[startIdx], data[startIdx + 1], data[startIdx + 2], data[startIdx + 3]];
 
-  const idx = (startY * CANVAS_DISPLAY_SIZE + startX) * 4;
-  const startR = data[idx];
-  const startG = data[idx + 1];
-  const startB = data[idx + 2];
-  const startA = data[idx + 3];
+  const hex = currentColor.replace("#", "");
+  const fillColor = [
+    parseInt(hex.substring(0, 2), 16),
+    parseInt(hex.substring(2, 4), 16),
+    parseInt(hex.substring(4, 6), 16),
+    255
+  ];
 
-  if (startR === targetColor[0] && startG === targetColor[1] && startB === targetColor[2] && startA === targetColor[3]) {
-    return;
-  }
-
-  const matchesStart = (i) => {
-    return data[i] === startR && data[i + 1] === startG && data[i + 2] === startB && data[i + 3] === startA;
-  };
+  if (isColorMatch(targetColor, fillColor)) return;
 
   const stack = [[startGridX, startGridY]];
   const visited = new Set();
+  const cols = canvas.width / pixelSize;
+  const rows = canvas.height / pixelSize;
 
   while (stack.length > 0) {
-    const [gx, gy] = stack.pop();
-    const key = gx + "," + gy;
+    const [cx, cy] = stack.pop();
+    const key = `${cx},${cy}`;
 
     if (visited.has(key)) continue;
-    if (gx < 0 || gx >= resolution || gy < 0 || gy >= resolution) continue;
-
-    const px = gx * pixelSize + Math.floor(pixelSize / 2);
-    const py = gy * pixelSize + Math.floor(pixelSize / 2);
-    const pixelIdx = (py * CANVAS_DISPLAY_SIZE + px) * 4;
-
-    if (!matchesStart(pixelIdx)) continue;
-
     visited.add(key);
 
-    for (let dy = 0; dy < pixelSize; dy++) {
-      for (let dx = 0; dx < pixelSize; dx++) {
-        const fillIdx = ((gy * pixelSize + dy) * CANVAS_DISPLAY_SIZE + (gx * pixelSize + dx)) * 4;
-        data[fillIdx] = targetColor[0];
-        data[fillIdx + 1] = targetColor[1];
-        data[fillIdx + 2] = targetColor[2];
-        data[fillIdx + 3] = targetColor[3];
-      }
+    if (cx < 0 || cy < 0 || cx >= cols || cy >= rows) continue;
+
+    const checkX = (cx * pixelSize) + (pixelSize / 2);
+    const checkY = (cy * pixelSize) + (pixelSize / 2);
+    const idx = (Math.floor(checkY) * canvas.width + Math.floor(checkX)) * 4;
+    const currentColorData = [data[idx], data[idx + 1], data[idx + 2], data[idx + 3]];
+
+    if (isColorMatch(currentColorData, targetColor)) {
+      ctx.fillStyle = currentColor;
+      ctx.fillRect(cx * pixelSize, cy * pixelSize, pixelSize, pixelSize);
+
+      stack.push([cx + 1, cy]);
+      stack.push([cx - 1, cy]);
+      stack.push([cx, cy + 1]);
+      stack.push([cx, cy - 1]);
     }
-
-    stack.push([gx + 1, gy]);
-    stack.push([gx - 1, gy]);
-    stack.push([gx, gy + 1]);
-    stack.push([gx, gy - 1]);
   }
-
-  ctx.putImageData(imageData, 0, 0);
 }
 function drawLineBetween(x0, y0, x1, y1) {
   const dx = Math.abs(x1 - x0);
@@ -155,6 +152,7 @@ function drawLineBetween(x0, y0, x1, y1) {
 
 /* ---- Drawing helpers ---- */
 function startDraw(e) {
+  if (currentTool === "fill") return;
   drawing = true;
   saveState();
   const rect = canvas.getBoundingClientRect();
@@ -172,7 +170,7 @@ function stopDraw() {
 }
 
 function draw(e) {
-  if (!drawing) return;
+  if (!drawing || currentTool === "fill") return;
 
   const rect = canvas.getBoundingClientRect();
   const x = e.clientX - rect.left;
@@ -259,6 +257,8 @@ function setResolution(newRes) {
   canvas.height = CANVAS_DISPLAY_SIZE;
   ctx.imageSmoothingEnabled = false;
   ctx.clearRect(0, 0, CANVAS_DISPLAY_SIZE, CANVAS_DISPLAY_SIZE);
+  ctx.fillStyle = "#FFFFFF";
+  ctx.fillRect(0, 0, CANVAS_DISPLAY_SIZE, CANVAS_DISPLAY_SIZE);
   drawGrid();
 
   /* Load the new resolution's canvas */
@@ -322,6 +322,8 @@ document.addEventListener("keydown", (e) => {
 /* ---- Clear Canvas ---- */
 document.getElementById("clearBtn").addEventListener("click", () => {
   ctx.clearRect(0, 0, CANVAS_DISPLAY_SIZE, CANVAS_DISPLAY_SIZE);
+  ctx.fillStyle = "#FFFFFF";
+  ctx.fillRect(0, 0, CANVAS_DISPLAY_SIZE, CANVAS_DISPLAY_SIZE);
   drawGrid();
   saveCanvas();
 });
