@@ -269,6 +269,7 @@ function setResolution(newRes) {
 
 /* ---- Color System ---- */
 const colorPreview = document.getElementById("colorPreview");
+const colorHex = document.getElementById("colorHex");
 const colorPickerPopup = document.getElementById("colorPickerPopup");
 const customColorInput = document.getElementById("customColor");
 const recentColorsRow = document.getElementById("recentColorsRow");
@@ -276,6 +277,7 @@ const recentColorsRow = document.getElementById("recentColorsRow");
 function setColor(color) {
   currentColor = color;
   colorPreview.style.backgroundColor = color;
+  colorHex.textContent = color.toUpperCase();
   customColorInput.value = color;
 
   /* Add to recent colors */

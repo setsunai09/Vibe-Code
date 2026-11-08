@@ -49,9 +49,13 @@
       <div class="toolbar__section">
         <h3 class="toolbar__label">Цвет</h3>
         <div class="color-picker-wrapper" id="colorPickerWrapper">
-          <div class="color-preview" id="colorPreview"></div>
+          <div class="color-preview" id="colorPreview">
+            <span class="color-preview-text" id="colorHex">#000000</span>
+          </div>
           <div class="color-picker-popup" id="colorPickerPopup">
+            <span class="custom-color-label">Свой цвет</span>
             <input type="color" class="custom-color-input" id="customColor" value="#000000">
+            <span class="custom-color-label">Базовые</span>
             <div class="base-colors">
               <button class="base-color" data-color="#000000" style="background:#000000"></button>
               <button class="base-color" data-color="#333333" style="background:#333333"></button>
