@@ -64,7 +64,73 @@ function drawBrushAt(gridX, gridY) {
   }
 }
 
-/* ---- Bresenham line to connect two grid cells ---- */
+/* ---- Flood Fill ---- */
+function hexToRGBA(hex) {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return [r, g, b, 255];
+}
+
+function floodFill(startGridX, startGridY) {
+  const imageData = ctx.getImageData(0, 0, CANVAS_DISPLAY_SIZE, CANVAS_DISPLAY_SIZE);
+  const data = imageData.data;
+
+  const targetColor = hexToRGBA(currentColor);
+
+  const startX = startGridX * pixelSize + Math.floor(pixelSize / 2);
+  const startY = startGridY * pixelSize + Math.floor(pixelSize / 2);
+
+  const idx = (startY * CANVAS_DISPLAY_SIZE + startX) * 4;
+  const startR = data[idx];
+  const startG = data[idx + 1];
+  const startB = data[idx + 2];
+  const startA = data[idx + 3];
+
+  if (startR === targetColor[0] && startG === targetColor[1] && startB === targetColor[2] && startA === targetColor[3]) {
+    return;
+  }
+
+  const matchesStart = (i) => {
+    return data[i] === startR && data[i + 1] === startG && data[i + 2] === startB && data[i + 3] === startA;
+  };
+
+  const stack = [[startGridX, startGridY]];
+  const visited = new Set();
+
+  while (stack.length > 0) {
+    const [gx, gy] = stack.pop();
+    const key = gx + "," + gy;
+
+    if (visited.has(key)) continue;
+    if (gx < 0 || gx >= resolution || gy < 0 || gy >= resolution) continue;
+
+    const px = gx * pixelSize + Math.floor(pixelSize / 2);
+    const py = gy * pixelSize + Math.floor(pixelSize / 2);
+    const pixelIdx = (py * CANVAS_DISPLAY_SIZE + px) * 4;
+
+    if (!matchesStart(pixelIdx)) continue;
+
+    visited.add(key);
+
+    for (let dy = 0; dy < pixelSize; dy++) {
+      for (let dx = 0; dx < pixelSize; dx++) {
+        const fillIdx = ((gy * pixelSize + dy) * CANVAS_DISPLAY_SIZE + (gx * pixelSize + dx)) * 4;
+        data[fillIdx] = targetColor[0];
+        data[fillIdx + 1] = targetColor[1];
+        data[fillIdx + 2] = targetColor[2];
+        data[fillIdx + 3] = targetColor[3];
+      }
+    }
+
+    stack.push([gx + 1, gy]);
+    stack.push([gx - 1, gy]);
+    stack.push([gx, gy + 1]);
+    stack.push([gx, gy - 1]);
+  }
+
+  ctx.putImageData(imageData, 0, 0);
+}
 function drawLineBetween(x0, y0, x1, y1) {
   const dx = Math.abs(x1 - x0);
   const dy = Math.abs(y1 - y0);
@@ -273,6 +339,19 @@ canvas.addEventListener("mousedown", startDraw);
 canvas.addEventListener("mousemove", draw);
 canvas.addEventListener("mouseup", stopDraw);
 canvas.addEventListener("mouseleave", stopDraw);
+
+/* ---- Fill Tool Click ---- */
+canvas.addEventListener("click", (e) => {
+  if (currentTool !== "fill") return;
+
+  saveState();
+  const rect = canvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+  const cell = snapToGrid(x, y);
+  floodFill(cell.x, cell.y);
+  saveCanvas();
+});
 
 /* ---- Init ---- */
 const savedRes = parseInt(localStorage.getItem("pixelArtResolution"), 10);
