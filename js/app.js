@@ -48,7 +48,51 @@ function draw(e) {
   ctx.moveTo(x, y);
 }
 
-/* ---- Events ---- */
+/* ---- Palette ---- */
+const swatches = document.querySelectorAll(".color-swatch");
+
+swatches.forEach((swatch) => {
+  swatch.addEventListener("click", () => {
+    swatches.forEach((s) => s.classList.remove("color-swatch--active"));
+    swatch.classList.add("color-swatch--active");
+    currentColor = swatch.dataset.color;
+  });
+});
+
+/* ---- Brush Size ---- */
+const brushSlider = document.querySelector(".brush-size");
+const brushValue = document.querySelector(".brush-size-value");
+
+brushSlider.addEventListener("input", () => {
+  brushSize = parseInt(brushSlider.value, 10);
+  brushValue.textContent = brushSize;
+});
+
+/* ---- Tool Buttons ---- */
+const toolBtns = document.querySelectorAll(".tool-btn");
+
+toolBtns.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    toolBtns.forEach((b) => b.classList.remove("tool-btn--active"));
+    btn.classList.add("tool-btn--active");
+    currentTool = btn.dataset.tool;
+  });
+});
+
+/* ---- Clear Canvas ---- */
+document.getElementById("clearBtn").addEventListener("click", () => {
+  ctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
+});
+
+/* ---- Download ---- */
+document.getElementById("downloadBtn").addEventListener("click", () => {
+  const link = document.createElement("a");
+  link.download = "pixel-art.png";
+  link.href = canvas.toDataURL("image/png");
+  link.click();
+});
+
+/* ---- Mouse Events ---- */
 canvas.addEventListener("mousedown", startDraw);
 canvas.addEventListener("mousemove", draw);
 canvas.addEventListener("mouseup", stopDraw);
