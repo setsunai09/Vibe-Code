@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Pixel Art Studio</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Press+Start+2P&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -16,10 +16,11 @@
   <div class="layout">
     <aside class="toolbar">
       <div class="toolbar__section">
-        <h3 class="toolbar__label">Кисть</h3>
-        <button class="tool-btn tool-btn--active" data-tool="brush">🖌 Кисть</button>
-        <button class="tool-btn" data-tool="eraser">🧹 Ластик</button>
-        <button class="tool-btn" data-tool="fill">🪣 Заливка</button>
+        <h3 class="toolbar__label">Инструменты</h3>
+        <button class="tool-btn tool-btn--active" data-tool="brush">Кисть</button>
+        <button class="tool-btn" data-tool="eraser">Ластик</button>
+        <button class="tool-btn" data-tool="fill">Заливка</button>
+        <button class="tool-btn" data-tool="picker">Пипетка</button>
       </div>
 
       <div class="toolbar__section">
@@ -31,35 +32,51 @@
       <div class="toolbar__section">
         <h3 class="toolbar__label">Отмена</h3>
         <div class="undo-redo-row">
-          <button class="action-btn action-btn--undo" id="undoBtn">↩ Отменить</button>
-          <button class="action-btn action-btn--redo" id="redoBtn">↪ Вернуть</button>
+          <button class="action-btn action-btn--undo" id="undoBtn">Отменить</button>
+          <button class="action-btn action-btn--redo" id="redoBtn">Вернуть</button>
         </div>
       </div>
 
       <div class="toolbar__section">
         <h3 class="toolbar__label">Разрешение</h3>
         <select class="resolution-select" id="resolutionSelect">
-          <option value="16">16 × 16</option>
-          <option value="32" selected>32 × 32</option>
-          <option value="64">64 × 64</option>
+          <option value="16">16 x 16</option>
+          <option value="32" selected>32 x 32</option>
+          <option value="64">64 x 64</option>
         </select>
       </div>
 
       <div class="toolbar__section">
-        <h3 class="toolbar__label">Палитра</h3>
-        <div class="palette">
-          <button class="color-swatch color-swatch--active" data-color="#000000" style="background:#000000"></button>
-          <button class="color-swatch" data-color="#ff4d8d" style="background:#ff4d8d"></button>
-          <button class="color-swatch" data-color="#ff85b8" style="background:#ff85b8"></button>
-          <button class="color-swatch" data-color="#ffb3d1" style="background:#ffb3d1"></button>
-          <button class="color-swatch" data-color="#a855f7" style="background:#a855f7"></button>
-          <button class="color-swatch" data-color="#3b82f6" style="background:#3b82f6"></button>
+        <h3 class="toolbar__label">Цвет</h3>
+        <div class="color-picker-wrapper" id="colorPickerWrapper">
+          <div class="color-preview" id="colorPreview"></div>
+          <div class="color-picker-popup" id="colorPickerPopup">
+            <input type="color" class="custom-color-input" id="customColor" value="#000000">
+            <div class="base-colors">
+              <button class="base-color" data-color="#000000" style="background:#000000"></button>
+              <button class="base-color" data-color="#333333" style="background:#333333"></button>
+              <button class="base-color" data-color="#666666" style="background:#666666"></button>
+              <button class="base-color" data-color="#999999" style="background:#999999"></button>
+              <button class="base-color" data-color="#cccccc" style="background:#cccccc"></button>
+              <button class="base-color" data-color="#ffffff" style="background:#ffffff"></button>
+              <button class="base-color" data-color="#ff6b6b" style="background:#ff6b6b"></button>
+              <button class="base-color" data-color="#ffa94d" style="background:#ffa94d"></button>
+              <button class="base-color" data-color="#ffd43b" style="background:#ffd43b"></button>
+              <button class="base-color" data-color="#69db7c" style="background:#69db7c"></button>
+              <button class="base-color" data-color="#4dabf7" style="background:#4dabf7"></button>
+              <button class="base-color" data-color="#da77f2" style="background:#da77f2"></button>
+            </div>
+            <div class="recent-colors">
+              <span class="recent-label">Недавние</span>
+              <div class="recent-colors-row" id="recentColorsRow"></div>
+            </div>
+          </div>
         </div>
       </div>
 
       <div class="toolbar__section toolbar__section--bottom">
-        <button class="action-btn action-btn--clear" id="clearBtn">🗑 Очистить всё</button>
-        <button class="action-btn action-btn--download" id="downloadBtn">💾 Скачать</button>
+        <button class="action-btn action-btn--clear" id="clearBtn">Очистить</button>
+        <button class="action-btn action-btn--download" id="downloadBtn">Скачать</button>
       </div>
     </aside>
 

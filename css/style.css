@@ -13,42 +13,27 @@ body {
 }
 
 body {
-  font-family: "Press Start 2P", monospace;
-  background-color: #fce4ec;
-  color: #333;
+  font-family: "Nunito", sans-serif;
+  background-color: #fff0f5;
+  color: #6b4c5e;
   overflow: hidden;
-}
-
-/* ===== Background Hearts ===== */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background-image:
-    radial-gradient(circle, #f8bbd0 1px, transparent 1px),
-    radial-gradient(circle, #f8bbd0 1px, transparent 1px);
-  background-size: 60px 60px;
-  background-position: 0 0, 30px 30px;
-  opacity: 0.35;
-  pointer-events: none;
-  z-index: 0;
 }
 
 /* ===== Header ===== */
 .header {
   position: relative;
   z-index: 10;
-  background: linear-gradient(135deg, #ec4899, #a855f7);
+  background-color: #fff;
   padding: 14px 24px;
-  box-shadow: 0 4px 20px rgba(168, 85, 247, 0.3);
+  box-shadow: 0 2px 12px rgba(219, 112, 147, 0.08);
 }
 
 .header__title {
-  font-size: 1.1rem;
-  color: #fff;
+  font-family: "Press Start 2P", monospace;
+  font-size: 1rem;
+  color: #d4728c;
   text-align: center;
-  letter-spacing: 2px;
-  text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.15);
+  letter-spacing: 1px;
 }
 
 /* ===== Layout ===== */
@@ -71,8 +56,8 @@ body::before {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  box-shadow: 0 8px 32px rgba(236, 72, 153, 0.15);
-  border: 3px solid #f9a8d4;
+  box-shadow: 0 4px 24px rgba(219, 112, 147, 0.1);
+  border: 2px solid #fce4ec;
   overflow-y: auto;
 }
 
@@ -84,50 +69,51 @@ body::before {
 
 .toolbar__section--bottom {
   margin-top: auto;
-  gap: 12px;
+  gap: 10px;
 }
 
 .toolbar__label {
-  font-size: 0.55rem;
-  color: #ec4899;
-  margin-bottom: 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #d4728c;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 /* ===== Tool Buttons ===== */
 .tool-btn {
-  font-family: "Press Start 2P", monospace;
-  font-size: 0.5rem;
+  font-family: "Nunito", sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
   padding: 10px 12px;
-  border: 2px solid transparent;
+  border: 2px solid #fce4ec;
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.15s ease;
-  background: linear-gradient(135deg, #fce7f3, #fbcfe8);
-  color: #be185d;
+  background-color: #fff;
+  color: #8b5e7b;
 }
 
 .tool-btn:hover {
-  background: linear-gradient(135deg, #fbcfe8, #f9a8d4);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(236, 72, 153, 0.2);
+  background-color: #fce4ec;
 }
 
 .tool-btn--active {
-  background: linear-gradient(135deg, #ec4899, #a855f7);
+  background-color: #f8a4b8;
+  border-color: #f8a4b8;
   color: #fff;
-  border-color: #fff;
-  box-shadow: 0 4px 16px rgba(168, 85, 247, 0.35);
 }
 
 /* ===== Resolution Select ===== */
 .resolution-select {
-  font-family: "Press Start 2P", monospace;
-  font-size: 0.45rem;
-  padding: 8px 6px;
-  border: 2px solid #f9a8d4;
+  font-family: "Nunito", sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 8px 10px;
+  border: 2px solid #fce4ec;
   border-radius: 10px;
-  background: #fce7f3;
-  color: #be185d;
+  background: #fff;
+  color: #8b5e7b;
   cursor: pointer;
   width: 100%;
   outline: none;
@@ -135,61 +121,163 @@ body::before {
 }
 
 .resolution-select:focus {
-  border-color: #ec4899;
-}
-
-/* ===== Undo/Redo Row ===== */
-.undo-redo-row {
-  display: flex;
-  gap: 8px;
+  border-color: #f8a4b8;
 }
 
 /* ===== Brush Size ===== */
 .brush-size {
   width: 100%;
-  accent-color: #ec4899;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  border-radius: 3px;
+  background: #fce4ec;
+  cursor: pointer;
+}
+
+.brush-size::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #f8a4b8;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+}
+
+.brush-size::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #f8a4b8;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
   cursor: pointer;
 }
 
 .brush-size-value {
-  font-size: 0.55rem;
-  color: #ec4899;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #d4728c;
   text-align: center;
 }
 
-/* ===== Palette ===== */
-.palette {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px;
+/* ===== Color Picker ===== */
+.color-picker-wrapper {
+  position: relative;
 }
 
-.color-swatch {
+.color-preview {
+  width: 100%;
+  height: 48px;
+  border-radius: 12px;
+  border: 2px solid #fce4ec;
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.color-preview:hover {
+  border-color: #f8a4b8;
+  box-shadow: 0 2px 8px rgba(248, 164, 184, 0.25);
+}
+
+.color-picker-popup {
+  display: none;
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  width: 100%;
+  background: #fff;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 8px 32px rgba(219, 112, 147, 0.15);
+  z-index: 100;
+  border: 2px solid #fce4ec;
+}
+
+.color-picker-popup.open {
+  display: block;
+}
+
+.custom-color-input {
+  width: 100%;
+  height: 40px;
+  border: 2px solid #fce4ec;
+  border-radius: 10px;
+  cursor: pointer;
+  padding: 4px;
+  background: #fff5f8;
+  margin-bottom: 12px;
+}
+
+.base-colors {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.base-color {
   width: 100%;
   aspect-ratio: 1;
-  border-radius: 50%;
-  border: 3px solid transparent;
+  border: 2px solid #f0d0da;
+  border-radius: 10px;
   cursor: pointer;
-  transition: all 0.15s ease;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.1s ease, border-color 0.15s ease;
 }
 
-.color-swatch:hover {
-  transform: scale(1.15);
-}
-
-.color-swatch--active {
-  border-color: #ec4899;
-  box-shadow: 0 0 0 3px #fce7f3, 0 0 0 5px #ec4899;
+.base-color:hover {
   transform: scale(1.1);
+  border-color: #f8a4b8;
+}
+
+.recent-colors {
+  border-top: 1px solid #fce4ec;
+  padding-top: 10px;
+}
+
+.recent-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #d4728c;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.recent-colors-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.recent-color {
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  min-height: 24px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  border: 2px solid #fce4ec;
+  cursor: pointer;
+  transition: transform 0.1s ease, border-color 0.15s ease;
+}
+
+.recent-color:hover {
+  transform: scale(1.15);
+  border-color: #f8a4b8;
 }
 
 /* ===== Action Buttons ===== */
 .action-btn {
-  font-family: "Press Start 2P", monospace;
-  font-size: 0.45rem;
-  padding: 12px 10px;
-  border: none;
+  font-family: "Nunito", sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 10px 12px;
+  border: 2px solid #fce4ec;
   border-radius: 12px;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -197,43 +285,39 @@ body::before {
 }
 
 .action-btn--clear {
-  background: linear-gradient(135deg, #f87171, #ef4444);
+  background-color: #f8a4b8;
 }
 
 .action-btn--clear:hover {
-  background: linear-gradient(135deg, #ef4444, #dc2626);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+  background-color: #f08fa3;
+  border-color: #f08fa3;
 }
 
 .action-btn--download {
-  background: linear-gradient(135deg, #34d399, #10b981);
+  background-color: #d4728c;
 }
 
 .action-btn--download:hover {
-  background: linear-gradient(135deg, #10b981, #059669);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  background-color: #c4617a;
+  border-color: #c4617a;
 }
 
 .action-btn--undo {
-  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  background-color: #f8a4b8;
 }
 
 .action-btn--undo:hover {
-  background: linear-gradient(135deg, #f59e0b, #d97706);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+  background-color: #f08fa3;
+  border-color: #f08fa3;
 }
 
 .action-btn--redo {
-  background: linear-gradient(135deg, #60a5fa, #3b82f6);
+  background-color: #f8a4b8;
 }
 
 .action-btn--redo:hover {
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+  background-color: #f08fa3;
+  border-color: #f08fa3;
 }
 
 /* ===== Canvas Area ===== */
@@ -246,8 +330,8 @@ body::before {
 
 #drawingCanvas {
   background: #ffffff;
-  border: 4px solid #111;
+  border: 3px solid #fce4ec;
   border-radius: 12px;
   cursor: crosshair;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 8px 32px rgba(219, 112, 147, 0.1);
 }

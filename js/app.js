@@ -17,6 +17,7 @@ let lastGridY = -1;
 let history = [];
 let redoStack = [];
 const MAX_HISTORY = 30;
+let recentColors = [];
 
 /* ---- Canvas setup ---- */
 canvas.width = CANVAS_DISPLAY_SIZE;
@@ -128,6 +129,7 @@ function floodFill(startGridX, startGridY) {
     }
   }
 }
+
 function drawLineBetween(x0, y0, x1, y1) {
   const dx = Math.abs(x1 - x0);
   const dy = Math.abs(y1 - y0);
@@ -152,7 +154,7 @@ function drawLineBetween(x0, y0, x1, y1) {
 
 /* ---- Drawing helpers ---- */
 function startDraw(e) {
-  if (currentTool === "fill") return;
+  if (currentTool === "fill" || currentTool === "picker") return;
   drawing = true;
   saveState();
   const rect = canvas.getBoundingClientRect();
@@ -265,14 +267,94 @@ function setResolution(newRes) {
   loadCanvas(resolution);
 }
 
-/* ---- Palette ---- */
-const swatches = document.querySelectorAll(".color-swatch");
+/* ---- Color System ---- */
+const colorPreview = document.getElementById("colorPreview");
+const colorPickerPopup = document.getElementById("colorPickerPopup");
+const customColorInput = document.getElementById("customColor");
+const recentColorsRow = document.getElementById("recentColorsRow");
 
-swatches.forEach((swatch) => {
-  swatch.addEventListener("click", () => {
-    swatches.forEach((s) => s.classList.remove("color-swatch--active"));
-    swatch.classList.add("color-swatch--active");
-    currentColor = swatch.dataset.color;
+function setColor(color) {
+  currentColor = color;
+  colorPreview.style.backgroundColor = color;
+  customColorInput.value = color;
+
+  /* Add to recent colors */
+  recentColors = recentColors.filter((c) => c !== color);
+  recentColors.unshift(color);
+  if (recentColors.length > 6) recentColors.pop();
+  saveRecentColors();
+  renderRecentColors();
+}
+
+function saveRecentColors() {
+  try {
+    localStorage.setItem("pixelArtRecentColors", JSON.stringify(recentColors));
+  } catch (e) {
+    /* localStorage is full or disabled */
+  }
+}
+
+function loadRecentColors() {
+  try {
+    const data = localStorage.getItem("pixelArtRecentColors");
+    if (data) {
+      recentColors = JSON.parse(data);
+    }
+  } catch (e) {
+    recentColors = [];
+  }
+}
+
+function renderRecentColors() {
+  recentColorsRow.innerHTML = "";
+  recentColors.forEach((color) => {
+    const btn = document.createElement("button");
+    btn.className = "recent-color";
+    btn.style.backgroundColor = color;
+    btn.addEventListener("click", () => setColor(color));
+    recentColorsRow.appendChild(btn);
+  });
+}
+
+/* Color picker popup toggle */
+colorPreview.addEventListener("click", () => {
+  colorPickerPopup.classList.toggle("open");
+});
+
+document.addEventListener("click", (e) => {
+  if (!e.target.closest(".color-picker-wrapper")) {
+    colorPickerPopup.classList.remove("open");
+  }
+});
+
+/* Custom color input */
+customColorInput.addEventListener("input", () => {
+  setColor(customColorInput.value);
+});
+
+/* Base colors */
+document.querySelectorAll(".base-color").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    setColor(btn.dataset.color);
+  });
+});
+
+/* ---- Pipette Tool ---- */
+canvas.addEventListener("click", (e) => {
+  if (currentTool !== "picker") return;
+
+  const rect = canvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+  const pixel = ctx.getImageData(Math.floor(x), Math.floor(y), 1, 1).data;
+  const hex = "#" + [pixel[0], pixel[1], pixel[2]].map((c) => c.toString(16).padStart(2, "0")).join("");
+  setColor(hex);
+
+  /* Switch back to brush */
+  currentTool = "brush";
+  toolBtns.forEach((b) => {
+    b.classList.remove("tool-btn--active");
+    if (b.dataset.tool === "brush") b.classList.add("tool-btn--active");
   });
 });
 
@@ -365,3 +447,7 @@ if (savedRes && RESOLUTIONS.includes(savedRes)) {
 pixelSize = CANVAS_DISPLAY_SIZE / resolution;
 drawGrid();
 loadCanvas(resolution);
+
+loadRecentColors();
+renderRecentColors();
+setColor(currentColor);
