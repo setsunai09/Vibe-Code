@@ -7,22 +7,71 @@ const CANVAS_H = 500;
 canvas.width = CANVAS_W;
 canvas.height = CANVAS_H;
 
+/* ---- Disable smoothing for pixel look ---- */
+ctx.imageSmoothingEnabled = false;
+
 /* ---- State ---- */
 let drawing = false;
 let currentTool = "brush";
 let currentColor = "#000000";
 let brushSize = 3;
+let lastX = 0;
+let lastY = 0;
 
 /* ---- Drawing helpers ---- */
 function startDraw(e) {
   drawing = true;
-  draw(e);
+  const rect = canvas.getBoundingClientRect();
+  lastX = e.clientX - rect.left;
+  lastY = e.clientY - rect.top;
+  drawPixel(lastX, lastY);
 }
 
 function stopDraw() {
   drawing = false;
-  ctx.beginPath();
   saveCanvas();
+}
+
+function drawPixel(x, y) {
+  const size = brushSize;
+  const half = Math.floor(size / 2);
+
+  if (currentTool === "eraser") {
+    ctx.globalCompositeOperation = "destination-out";
+    ctx.fillStyle = "rgba(0,0,0,1)";
+  } else {
+    ctx.globalCompositeOperation = "source-over";
+    ctx.fillStyle = currentColor;
+  }
+
+  ctx.fillRect(Math.round(x - half), Math.round(y - half), size, size);
+}
+
+function drawLine(x, y) {
+  const dx = x - lastX;
+  const dy = y - lastY;
+  const dist = Math.sqrt(dx * dx + dy * dy);
+  const steps = Math.max(Math.ceil(dist / brushSize), 1);
+
+  for (let i = 1; i <= steps; i++) {
+    const t = i / steps;
+    const px = lastX + dx * t;
+    const py = lastY + dy * t;
+    drawPixel(px, py);
+  }
+
+  lastX = x;
+  lastY = y;
+}
+
+function draw(e) {
+  if (!drawing) return;
+
+  const rect = canvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+
+  drawLine(x, y);
 }
 
 /* ---- Save / Load ---- */
@@ -42,36 +91,6 @@ function loadCanvas() {
     ctx.drawImage(img, 0, 0);
   };
   img.src = data;
-}
-
-/* ---- Clear Canvas ---- */
-document.getElementById("clearBtn").addEventListener("click", () => {
-  ctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
-  saveCanvas();
-});
-
-function draw(e) {
-  if (!drawing) return;
-
-  const rect = canvas.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const y = e.clientY - rect.top;
-
-  ctx.lineWidth = brushSize;
-  ctx.lineCap = "round";
-  ctx.lineJoin = "round";
-
-  if (currentTool === "eraser") {
-    ctx.globalCompositeOperation = "destination-out";
-  } else {
-    ctx.globalCompositeOperation = "source-over";
-    ctx.strokeStyle = currentColor;
-  }
-
-  ctx.lineTo(x, y);
-  ctx.stroke();
-  ctx.beginPath();
-  ctx.moveTo(x, y);
 }
 
 /* ---- Palette ---- */
@@ -108,6 +127,7 @@ toolBtns.forEach((btn) => {
 /* ---- Clear Canvas ---- */
 document.getElementById("clearBtn").addEventListener("click", () => {
   ctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
+  saveCanvas();
 });
 
 /* ---- Download ---- */
