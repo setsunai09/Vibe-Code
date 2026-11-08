@@ -22,7 +22,33 @@ function startDraw(e) {
 function stopDraw() {
   drawing = false;
   ctx.beginPath();
+  saveCanvas();
 }
+
+/* ---- Save / Load ---- */
+function saveCanvas() {
+  try {
+    localStorage.setItem("pixelArtCanvas", canvas.toDataURL("image/png"));
+  } catch (e) {
+    /* localStorage is full or disabled */
+  }
+}
+
+function loadCanvas() {
+  const data = localStorage.getItem("pixelArtCanvas");
+  if (!data) return;
+  const img = new Image();
+  img.onload = () => {
+    ctx.drawImage(img, 0, 0);
+  };
+  img.src = data;
+}
+
+/* ---- Clear Canvas ---- */
+document.getElementById("clearBtn").addEventListener("click", () => {
+  ctx.clearRect(0, 0, CANVAS_W, CANVAS_H);
+  saveCanvas();
+});
 
 function draw(e) {
   if (!drawing) return;
@@ -97,3 +123,6 @@ canvas.addEventListener("mousedown", startDraw);
 canvas.addEventListener("mousemove", draw);
 canvas.addEventListener("mouseup", stopDraw);
 canvas.addEventListener("mouseleave", stopDraw);
+
+/* ---- Load saved drawing on start ---- */
+loadCanvas();
