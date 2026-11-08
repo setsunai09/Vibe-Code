@@ -119,6 +119,25 @@ body::before {
   box-shadow: 0 4px 16px rgba(168, 85, 247, 0.35);
 }
 
+/* ===== Resolution Select ===== */
+.resolution-select {
+  font-family: "Press Start 2P", monospace;
+  font-size: 0.45rem;
+  padding: 8px 6px;
+  border: 2px solid #f9a8d4;
+  border-radius: 10px;
+  background: #fce7f3;
+  color: #be185d;
+  cursor: pointer;
+  width: 100%;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.resolution-select:focus {
+  border-color: #ec4899;
+}
+
 /* ===== Brush Size ===== */
 .brush-size {
   width: 100%;
