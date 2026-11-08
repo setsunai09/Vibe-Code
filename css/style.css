@@ -138,6 +138,12 @@ body::before {
   border-color: #ec4899;
 }
 
+/* ===== Undo/Redo Row ===== */
+.undo-redo-row {
+  display: flex;
+  gap: 8px;
+}
+
 /* ===== Brush Size ===== */
 .brush-size {
   width: 100%;
@@ -218,6 +224,16 @@ body::before {
   background: linear-gradient(135deg, #f59e0b, #d97706);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+.action-btn--redo {
+  background: linear-gradient(135deg, #60a5fa, #3b82f6);
+}
+
+.action-btn--redo:hover {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
 }
 
 /* ===== Canvas Area ===== */

@@ -15,6 +15,7 @@ let brushSize = 1;
 let lastGridX = -1;
 let lastGridY = -1;
 let history = [];
+let redoStack = [];
 const MAX_HISTORY = 30;
 
 /* ---- Canvas setup ---- */
@@ -155,8 +156,10 @@ function loadCanvas(res) {
   img.src = data;
 }
 
-/* ---- Undo History ---- */
+/* ---- Undo / Redo History ---- */
 function saveState() {
+  /* New drawing clears redo stack */
+  redoStack = [];
   history.push(ctx.getImageData(0, 0, CANVAS_DISPLAY_SIZE, CANVAS_DISPLAY_SIZE));
   if (history.length > MAX_HISTORY) {
     history.shift();
@@ -165,7 +168,16 @@ function saveState() {
 
 function undo() {
   if (history.length === 0) return;
+  redoStack.push(ctx.getImageData(0, 0, CANVAS_DISPLAY_SIZE, CANVAS_DISPLAY_SIZE));
   const state = history.pop();
+  ctx.putImageData(state, 0, 0);
+  saveCanvas();
+}
+
+function redo() {
+  if (redoStack.length === 0) return;
+  history.push(ctx.getImageData(0, 0, CANVAS_DISPLAY_SIZE, CANVAS_DISPLAY_SIZE));
+  const state = redoStack.pop();
   ctx.putImageData(state, 0, 0);
   saveCanvas();
 }
@@ -225,14 +237,19 @@ toolBtns.forEach((btn) => {
   });
 });
 
-/* ---- Undo ---- */
+/* ---- Undo / Redo ---- */
 document.getElementById("undoBtn").addEventListener("click", undo);
+document.getElementById("redoBtn").addEventListener("click", redo);
 
-/* ---- Keyboard shortcut: Ctrl+Z ---- */
+/* ---- Keyboard shortcuts ---- */
 document.addEventListener("keydown", (e) => {
   if ((e.ctrlKey || e.metaKey) && e.key === "z") {
     e.preventDefault();
     undo();
+  }
+  if ((e.ctrlKey || e.metaKey) && (e.key === "y" || (e.shiftKey && e.key === "Z"))) {
+    e.preventDefault();
+    redo();
   }
 });
 
