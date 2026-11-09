@@ -48,16 +48,16 @@ body {
 
 /* ===== Toolbar ===== */
 .toolbar {
-  width: 200px;
-  min-width: 200px;
-  max-width: 200px;
+  width: 180px;
+  min-width: 180px;
+  max-width: 180px;
   height: 100%;
   background: #fff;
   border-radius: 20px;
-  padding: 20px 16px;
+  padding: 14px 12px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 14px;
   box-shadow: 0 4px 24px rgba(219, 112, 147, 0.1);
   border: 2px solid #fce4ec;
 }
@@ -65,16 +65,16 @@ body {
 .toolbar__section {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 6px;
 }
 
 .toolbar__section--bottom {
   margin-top: auto;
-  gap: 10px;
+  gap: 6px;
 }
 
 .toolbar__label {
-  font-size: 0.7rem;
+  font-size: 0.6rem;
   font-weight: 700;
   color: #d4728c;
   text-transform: uppercase;
@@ -84,11 +84,11 @@ body {
 /* ===== Tool Buttons ===== */
 .tool-btn {
   font-family: "Nunito", sans-serif;
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   font-weight: 600;
-  padding: 10px 12px;
+  padding: 8px 10px;
   border: 2px solid #fce4ec;
-  border-radius: 12px;
+  border-radius: 10px;
   cursor: pointer;
   transition: all 0.15s ease;
   background-color: #fff;
@@ -108,11 +108,11 @@ body {
 /* ===== Resolution Select ===== */
 .resolution-select {
   font-family: "Nunito", sans-serif;
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   font-weight: 600;
-  padding: 8px 10px;
+  padding: 6px 8px;
   border: 2px solid #fce4ec;
-  border-radius: 10px;
+  border-radius: 8px;
   background: #fff;
   color: #8b5e7b;
   cursor: pointer;
@@ -159,7 +159,7 @@ body {
 }
 
 .brush-size-value {
-  font-size: 0.75rem;
+  font-size: 0.65rem;
   font-weight: 700;
   color: #d4728c;
   text-align: center;
@@ -172,8 +172,8 @@ body {
 
 .color-preview {
   width: 100%;
-  height: 48px;
-  border-radius: 12px;
+  height: 40px;
+  border-radius: 10px;
   border: 2px solid #fce4ec;
   cursor: pointer;
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
@@ -200,12 +200,12 @@ body {
 .color-picker-popup {
   display: none;
   position: absolute;
-  top: calc(100% + 8px);
+  top: calc(100% + 6px);
   left: 0;
   width: 100%;
   background: #fff;
-  border-radius: 16px;
-  padding: 16px;
+  border-radius: 12px;
+  padding: 12px;
   box-shadow: 0 8px 32px rgba(219, 112, 147, 0.15);
   z-index: 100;
   border: 2px solid #fce4ec;
@@ -217,13 +217,13 @@ body {
 
 .custom-color-input {
   width: 100%;
-  height: 40px;
+  height: 32px;
   border: 2px solid #fce4ec;
-  border-radius: 10px;
+  border-radius: 8px;
   cursor: pointer;
   padding: 4px;
   background: #fff5f8;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
 }
 
 .custom-color-label {
@@ -239,15 +239,15 @@ body {
 .base-colors {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 6px;
-  margin-bottom: 12px;
+  gap: 4px;
+  margin-bottom: 8px;
 }
 
 .base-color {
   width: 100%;
   aspect-ratio: 1;
   border: 2px solid #f0d0da;
-  border-radius: 10px;
+  border-radius: 8px;
   cursor: pointer;
   transition: transform 0.1s ease, border-color 0.15s ease;
 }
@@ -258,30 +258,30 @@ body {
 }
 
 .recent-colors {
-  padding-top: 4px;
+  padding-top: 6px;
 }
 
 .recent-label {
-  font-size: 0.65rem;
+  font-size: 0.55rem;
   font-weight: 700;
   color: #d4728c;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   display: block;
 }
 
 .recent-colors-row {
   display: flex;
-  gap: 6px;
+  gap: 4px;
   flex-wrap: wrap;
 }
 
 .recent-color {
-  width: 24px;
-  height: 24px;
-  min-width: 24px;
-  min-height: 24px;
+  width: 20px;
+  height: 20px;
+  min-width: 20px;
+  min-height: 20px;
   aspect-ratio: 1;
   border-radius: 50%;
   border: 2px solid #fce4ec;
@@ -298,17 +298,17 @@ body {
 .reference-controls {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .reference-control {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
 }
 
 .reference-label {
-  font-size: 0.6rem;
+  font-size: 0.55rem;
   font-weight: 700;
   color: #d4728c;
   text-transform: uppercase;
@@ -349,11 +349,11 @@ body {
 
 .reference-number {
   width: 100%;
-  padding: 4px 6px;
+  padding: 3px 6px;
   border: 2px solid #fce4ec;
-  border-radius: 8px;
+  border-radius: 6px;
   font-family: "Nunito", sans-serif;
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   font-weight: 600;
   color: #8b5e7b;
   background: #fff;
@@ -369,11 +369,11 @@ body {
 /* ===== Action Buttons ===== */
 .action-btn {
   font-family: "Nunito", sans-serif;
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 600;
-  padding: 10px 12px;
+  padding: 8px 10px;
   border: 2px solid #fce4ec;
-  border-radius: 12px;
+  border-radius: 10px;
   cursor: pointer;
   transition: all 0.15s ease;
   color: #fff;
@@ -474,8 +474,8 @@ body {
 /* Resize/Rotate Handles */
 .reference-handle {
   position: absolute;
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
   background: #f8a4b8;
   border: 2px solid #fff;
   border-radius: 50%;
@@ -485,68 +485,68 @@ body {
 }
 
 .reference-handle--rotate {
-  top: -24px;
+  top: -22px;
   left: 50%;
   cursor: grab;
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   background: #d4728c;
 }
 
 .reference-handle--nw {
-  top: -6px;
-  left: -6px;
+  top: -5px;
+  left: -5px;
   cursor: nwse-resize;
 }
 
 .reference-handle--ne {
-  top: -6px;
-  right: -6px;
+  top: -5px;
+  right: -5px;
   cursor: nesw-resize;
 }
 
 .reference-handle--sw {
-  bottom: -6px;
-  left: -6px;
+  bottom: -5px;
+  left: -5px;
   cursor: nesw-resize;
 }
 
 .reference-handle--se {
-  bottom: -6px;
-  right: -6px;
+  bottom: -5px;
+  right: -5px;
   cursor: nwse-resize;
 }
 
 .reference-handle--n {
-  top: -6px;
+  top: -5px;
   left: 50%;
   cursor: ns-resize;
 }
 
 .reference-handle--s {
-  bottom: -6px;
+  bottom: -5px;
   left: 50%;
   cursor: ns-resize;
 }
 
 .reference-handle--e {
   top: 50%;
-  right: -6px;
+  right: -5px;
   cursor: ew-resize;
 }
 
 .reference-handle--w {
   top: 50%;
-  left: -6px;
+  left: -5px;
   cursor: ew-resize;
 }
 
 #drawingCanvas {
   background: #ffffff;
-  border: 3px solid #fce4ec;
-  border-radius: 12px;
+  border: 2px solid #fce4ec;
+  border-radius: 10px;
   cursor: crosshair;
-  box-shadow: 0 8px 32px rgba(219, 112, 147, 0.1);
+  box-shadow: 0 6px 24px rgba(219, 112, 147, 0.1);
   position: relative;
   z-index: 10;
 }

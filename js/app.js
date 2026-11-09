@@ -481,11 +481,25 @@ document.addEventListener("keydown", (e) => {
 
 /* ---- Clear Canvas ---- */
 document.getElementById("clearBtn").addEventListener("click", () => {
+  /* Clear canvas */
   ctx.clearRect(0, 0, CANVAS_DISPLAY_SIZE, CANVAS_DISPLAY_SIZE);
   ctx.fillStyle = "#FFFFFF";
   ctx.fillRect(0, 0, CANVAS_DISPLAY_SIZE, CANVAS_DISPLAY_SIZE);
   drawGrid();
   saveCanvas();
+
+  /* Clear reference image */
+  referenceImage.src = "";
+  referenceContainer.classList.remove("visible");
+  referenceBtn.style.display = "block";
+  referenceToggle.style.display = "none";
+  referenceControls.style.display = "none";
+  referenceVisible = false;
+  referenceOnFront = false;
+  referenceContainer.style.zIndex = 5;
+  referenceFrontBtn.textContent = "Включить";
+  referenceFrontBtn.classList.remove("active");
+  localStorage.removeItem("pixelArtReference");
 });
 
 /* ---- Download ---- */

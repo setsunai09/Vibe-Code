@@ -30,6 +30,38 @@
       </div>
 
       <div class="toolbar__section">
+        <h3 class="toolbar__label">Цвет</h3>
+        <div class="color-picker-wrapper" id="colorPickerWrapper">
+          <div class="color-preview" id="colorPreview">
+            <span class="color-preview-text" id="colorHex">#000000</span>
+          </div>
+          <div class="color-picker-popup" id="colorPickerPopup">
+            <span class="custom-color-label">Свой цвет</span>
+            <input type="color" class="custom-color-input" id="customColor" value="#000000">
+            <span class="custom-color-label">Базовые</span>
+            <div class="base-colors">
+              <button class="base-color" data-color="#000000" style="background:#000000"></button>
+              <button class="base-color" data-color="#333333" style="background:#333333"></button>
+              <button class="base-color" data-color="#666666" style="background:#666666"></button>
+              <button class="base-color" data-color="#999999" style="background:#999999"></button>
+              <button class="base-color" data-color="#cccccc" style="background:#cccccc"></button>
+              <button class="base-color" data-color="#ffffff" style="background:#ffffff"></button>
+              <button class="base-color" data-color="#ff6b6b" style="background:#ff6b6b"></button>
+              <button class="base-color" data-color="#ffa94d" style="background:#ffa94d"></button>
+              <button class="base-color" data-color="#ffd43b" style="background:#ffd43b"></button>
+              <button class="base-color" data-color="#69db7c" style="background:#69db7c"></button>
+              <button class="base-color" data-color="#4dabf7" style="background:#4dabf7"></button>
+              <button class="base-color" data-color="#da77f2" style="background:#da77f2"></button>
+            </div>
+            <div class="recent-colors">
+              <span class="recent-label">Недавние</span>
+              <div class="recent-colors-row" id="recentColorsRow"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="toolbar__section">
         <h3 class="toolbar__label">Отмена</h3>
         <div class="undo-redo-row">
           <button class="action-btn action-btn--undo" id="undoBtn">Отменить</button>
@@ -74,38 +106,6 @@
           <div class="reference-control">
             <label class="reference-label">Поверх холста</label>
             <button class="action-btn action-btn--reference" id="referenceFrontBtn">Включить</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="toolbar__section">
-        <h3 class="toolbar__label">Цвет</h3>
-        <div class="color-picker-wrapper" id="colorPickerWrapper">
-          <div class="color-preview" id="colorPreview">
-            <span class="color-preview-text" id="colorHex">#000000</span>
-          </div>
-          <div class="color-picker-popup" id="colorPickerPopup">
-            <span class="custom-color-label">Свой цвет</span>
-            <input type="color" class="custom-color-input" id="customColor" value="#000000">
-            <span class="custom-color-label">Базовые</span>
-            <div class="base-colors">
-              <button class="base-color" data-color="#000000" style="background:#000000"></button>
-              <button class="base-color" data-color="#333333" style="background:#333333"></button>
-              <button class="base-color" data-color="#666666" style="background:#666666"></button>
-              <button class="base-color" data-color="#999999" style="background:#999999"></button>
-              <button class="base-color" data-color="#cccccc" style="background:#cccccc"></button>
-              <button class="base-color" data-color="#ffffff" style="background:#ffffff"></button>
-              <button class="base-color" data-color="#ff6b6b" style="background:#ff6b6b"></button>
-              <button class="base-color" data-color="#ffa94d" style="background:#ffa94d"></button>
-              <button class="base-color" data-color="#ffd43b" style="background:#ffd43b"></button>
-              <button class="base-color" data-color="#69db7c" style="background:#69db7c"></button>
-              <button class="base-color" data-color="#4dabf7" style="background:#4dabf7"></button>
-              <button class="base-color" data-color="#da77f2" style="background:#da77f2"></button>
-            </div>
-            <div class="recent-colors">
-              <span class="recent-label">Недавние</span>
-              <div class="recent-colors-row" id="recentColorsRow"></div>
-            </div>
           </div>
         </div>
       </div>
