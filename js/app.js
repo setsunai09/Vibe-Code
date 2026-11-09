@@ -302,7 +302,17 @@ function loadReference() {
 function saveState() {
   /* New drawing clears redo stack */
   redoStack = [];
-  history.push(ctx.getImageData(0, 0, CANVAS_DISPLAY_SIZE, CANVAS_DISPLAY_SIZE));
+  history.push({
+    canvas: ctx.getImageData(0, 0, CANVAS_DISPLAY_SIZE, CANVAS_DISPLAY_SIZE),
+    reference: {
+      position: { ...referencePosition },
+      scale: referenceScale,
+      rotation: referenceRotation,
+      opacity: referenceOpacity,
+      visible: referenceVisible,
+      onFront: referenceOnFront,
+    },
+  });
   if (history.length > MAX_HISTORY) {
     history.shift();
   }
@@ -310,17 +320,123 @@ function saveState() {
 
 function undo() {
   if (history.length === 0) return;
-  redoStack.push(ctx.getImageData(0, 0, CANVAS_DISPLAY_SIZE, CANVAS_DISPLAY_SIZE));
+  const currentState = {
+    canvas: ctx.getImageData(0, 0, CANVAS_DISPLAY_SIZE, CANVAS_DISPLAY_SIZE),
+    reference: {
+      position: { ...referencePosition },
+      scale: referenceScale,
+      rotation: referenceRotation,
+      opacity: referenceOpacity,
+      visible: referenceVisible,
+      onFront: referenceOnFront,
+    },
+  };
+  redoStack.push(currentState);
   const state = history.pop();
-  ctx.putImageData(state, 0, 0);
+
+  /* Restore canvas */
+  ctx.putImageData(state.canvas, 0, 0);
+
+  /* Restore reference */
+  const ref = state.reference;
+  referencePosition = ref.position;
+  referenceScale = ref.scale;
+  referenceRotation = ref.rotation;
+  referenceOpacity = ref.opacity;
+  referenceVisible = ref.visible;
+  referenceOnFront = ref.onFront;
+
+  if (referenceVisible) {
+    referenceContainer.classList.add("visible");
+    referenceBtn.style.display = "none";
+    referenceToggle.style.display = "block";
+    referenceControls.style.display = "flex";
+  } else {
+    referenceContainer.classList.remove("visible");
+    referenceBtn.style.display = "block";
+    referenceToggle.style.display = "none";
+    referenceControls.style.display = "none";
+  }
+
+  if (referenceOnFront) {
+    referenceContainer.style.zIndex = 20;
+    referenceFrontBtn.textContent = "Выключить";
+    referenceFrontBtn.classList.add("active");
+  } else {
+    referenceContainer.style.zIndex = 5;
+    referenceFrontBtn.textContent = "Включить";
+    referenceFrontBtn.classList.remove("active");
+  }
+
+  referenceOpacitySlider.value = referenceOpacity;
+  referenceScaleSlider.value = referenceScale;
+  referenceRotateSlider.value = referenceRotation;
+  opacityNumber.value = referenceOpacity;
+  scaleNumber.value = referenceScale;
+  rotateNumber.value = Math.round(referenceRotation);
+
+  updateReferenceTransform();
   saveCanvas();
 }
 
 function redo() {
   if (redoStack.length === 0) return;
-  history.push(ctx.getImageData(0, 0, CANVAS_DISPLAY_SIZE, CANVAS_DISPLAY_SIZE));
+  const currentState = {
+    canvas: ctx.getImageData(0, 0, CANVAS_DISPLAY_SIZE, CANVAS_DISPLAY_SIZE),
+    reference: {
+      position: { ...referencePosition },
+      scale: referenceScale,
+      rotation: referenceRotation,
+      opacity: referenceOpacity,
+      visible: referenceVisible,
+      onFront: referenceOnFront,
+    },
+  };
+  history.push(currentState);
   const state = redoStack.pop();
-  ctx.putImageData(state, 0, 0);
+
+  /* Restore canvas */
+  ctx.putImageData(state.canvas, 0, 0);
+
+  /* Restore reference */
+  const ref = state.reference;
+  referencePosition = ref.position;
+  referenceScale = ref.scale;
+  referenceRotation = ref.rotation;
+  referenceOpacity = ref.opacity;
+  referenceVisible = ref.visible;
+  referenceOnFront = ref.onFront;
+
+  if (referenceVisible) {
+    referenceContainer.classList.add("visible");
+    referenceBtn.style.display = "none";
+    referenceToggle.style.display = "block";
+    referenceControls.style.display = "flex";
+  } else {
+    referenceContainer.classList.remove("visible");
+    referenceBtn.style.display = "block";
+    referenceToggle.style.display = "none";
+    referenceControls.style.display = "none";
+  }
+
+  if (referenceOnFront) {
+    referenceContainer.style.zIndex = 20;
+    referenceFrontBtn.textContent = "Выключить";
+    referenceFrontBtn.classList.add("active");
+  } else {
+    referenceContainer.style.zIndex = 5;
+    referenceFrontBtn.textContent = "Включить";
+    referenceFrontBtn.classList.remove("active");
+  }
+
+  referenceOpacitySlider.value = referenceOpacity;
+  referenceScaleSlider.value = referenceScale;
+  referenceRotateSlider.value = referenceRotation;
+  opacityNumber.value = referenceOpacity;
+  scaleNumber.value = referenceScale;
+  rotateNumber.value = Math.round(referenceRotation);
+
+  updateReferenceTransform();
   saveCanvas();
 }
 
@@ -429,11 +545,7 @@ canvas.addEventListener("click", (e) => {
   setColor(hex);
 
   /* Switch back to brush */
-  currentTool = "brush";
-  toolBtns.forEach((b) => {
-    b.classList.remove("tool-btn--active");
-    if (b.dataset.tool === "brush") b.classList.add("tool-btn--active");
-  });
+  selectTool("brush");
 });
 
 /* ---- Brush Size ---- */
@@ -455,11 +567,17 @@ resolutionSelect.addEventListener("change", () => {
 /* ---- Tool Buttons ---- */
 const toolBtns = document.querySelectorAll(".tool-btn");
 
+function selectTool(toolName) {
+  currentTool = toolName;
+  toolBtns.forEach((b) => {
+    b.classList.remove("tool-btn--active");
+    if (b.dataset.tool === toolName) b.classList.add("tool-btn--active");
+  });
+}
+
 toolBtns.forEach((btn) => {
   btn.addEventListener("click", () => {
-    toolBtns.forEach((b) => b.classList.remove("tool-btn--active"));
-    btn.classList.add("tool-btn--active");
-    currentTool = btn.dataset.tool;
+    selectTool(btn.dataset.tool);
   });
 });
 
@@ -469,13 +587,77 @@ document.getElementById("redoBtn").addEventListener("click", redo);
 
 /* ---- Keyboard shortcuts ---- */
 document.addEventListener("keydown", (e) => {
-  if ((e.ctrlKey || e.metaKey) && e.key === "z") {
-    e.preventDefault();
-    undo();
+  /* Remove focus from inputs */
+  if (document.activeElement && (document.activeElement.tagName === "INPUT" || document.activeElement.tagName === "SELECT")) {
+    document.activeElement.blur();
   }
-  if ((e.ctrlKey || e.metaKey) && (e.key === "y" || (e.shiftKey && e.key === "Z"))) {
+
+  /* Undo / Redo */
+  if ((e.ctrlKey || e.metaKey) && e.code === "KeyZ") {
+    e.preventDefault();
+    if (e.shiftKey) {
+      redo();
+    } else {
+      undo();
+    }
+    return;
+  }
+  if ((e.ctrlKey || e.metaKey) && e.code === "KeyY") {
     e.preventDefault();
     redo();
+    return;
+  }
+
+  /* Tool shortcuts */
+  if (e.ctrlKey || e.metaKey) {
+    switch (e.code) {
+      case "KeyB":
+        e.preventDefault();
+        selectTool("brush");
+        break;
+      case "KeyE":
+        e.preventDefault();
+        selectTool("eraser");
+        break;
+      case "KeyG":
+        e.preventDefault();
+        selectTool("fill");
+        break;
+      case "KeyI":
+        e.preventDefault();
+        selectTool("picker");
+        break;
+      case "KeyS":
+        e.preventDefault();
+        document.getElementById("downloadBtn").click();
+        break;
+      case "KeyO":
+        e.preventDefault();
+        document.getElementById("referenceBtn").click();
+        break;
+      case "KeyN":
+        if (e.shiftKey) {
+          e.preventDefault();
+          document.getElementById("clearBtn").click();
+        }
+        break;
+    }
+  }
+
+  /* Delete reference image with Backspace/Delete */
+  if ((e.key === "Backspace" || e.key === "Delete") && referenceVisible) {
+    e.preventDefault();
+    referenceImage.src = "";
+    referenceContainer.classList.remove("visible");
+    referenceBtn.style.display = "block";
+    referenceToggle.style.display = "none";
+    referenceControls.style.display = "none";
+    referenceVisible = false;
+    referenceOnFront = false;
+    referenceContainer.style.zIndex = 5;
+    referenceFrontBtn.textContent = "Включить";
+    referenceFrontBtn.classList.remove("active");
+    localStorage.removeItem("pixelArtReference");
   }
 });
 
@@ -920,6 +1102,9 @@ document.addEventListener("mousemove", (e) => {
 
 /* ---- GLOBAL mouseup ---- */
 document.addEventListener("mouseup", () => {
+  if (referenceRotating || referenceResizing || referenceDragging) {
+    saveState();
+  }
   referenceRotating = false;
   referenceResizing = false;
   referenceDragging = false;
