@@ -212,6 +212,22 @@ function saveCanvas() {
   }
 }
 
+function saveReference() {
+  try {
+    const data = {
+      src: referenceImage.src,
+      position: referencePosition,
+      scale: referenceScale,
+      rotation: referenceRotation,
+      opacity: referenceOpacity,
+      onFront: referenceOnFront,
+    };
+    localStorage.setItem("pixelArtReference", JSON.stringify(data));
+  } catch (e) {
+    /* localStorage is full or disabled */
+  }
+}
+
 function loadCanvas(res) {
   const data = localStorage.getItem("pixelArtCanvas_" + res);
   if (!data) return;
@@ -220,6 +236,66 @@ function loadCanvas(res) {
     ctx.drawImage(img, 0, 0);
   };
   img.src = data;
+}
+
+function loadReference() {
+  const data = localStorage.getItem("pixelArtReference");
+  if (!data) return;
+  try {
+    const ref = JSON.parse(data);
+    if (!ref.src) return;
+
+    /* Set display states synchronously */
+    referenceImage.src = ref.src;
+    referenceContainer.classList.add("visible");
+    referenceBtn.style.display = "none";
+    referenceToggle.style.display = "block";
+    referenceControls.style.display = "flex";
+    referenceVisible = true;
+
+    /* Set values synchronously */
+    referencePosition = ref.position || { x: 0, y: 0 };
+    referenceScale = ref.scale || 100;
+    referenceRotation = ref.rotation || 0;
+    referenceOpacity = ref.opacity || 50;
+    referenceOnFront = ref.onFront || false;
+
+    if (referenceOnFront) {
+      referenceContainer.style.zIndex = 20;
+      referenceContainer.style.pointerEvents = "auto";
+      referenceFrontBtn.textContent = "Выключить";
+      referenceFrontBtn.classList.add("active");
+    } else {
+      referenceContainer.style.zIndex = 5;
+      referenceContainer.style.pointerEvents = "none";
+      referenceFrontBtn.textContent = "Включить";
+      referenceFrontBtn.classList.remove("active");
+    }
+
+    referenceOpacitySlider.value = referenceOpacity;
+    referenceScaleSlider.value = referenceScale;
+    referenceRotateSlider.value = referenceRotation;
+    opacityNumber.value = referenceOpacity;
+    scaleNumber.value = referenceScale;
+    rotateNumber.value = Math.round(referenceRotation);
+
+    /* Wait for image to load before transforming */
+    if (referenceImage.complete && referenceImage.naturalWidth > 0) {
+      originalImageWidth = referenceImage.naturalWidth;
+      originalImageHeight = referenceImage.naturalHeight;
+      updateReferenceTransform();
+      requestAnimationFrame(() => updateHandlePositions());
+    } else {
+      referenceImage.onload = () => {
+        originalImageWidth = referenceImage.naturalWidth;
+        originalImageHeight = referenceImage.naturalHeight;
+        updateReferenceTransform();
+        requestAnimationFrame(() => updateHandlePositions());
+      };
+    }
+  } catch (e) {
+    /* Invalid data */
+  }
 }
 
 /* ---- Undo / Redo History ---- */
@@ -453,3 +529,389 @@ loadCanvas(resolution);
 loadRecentColors();
 renderRecentColors();
 setColor(currentColor);
+
+/* ---- Reference Image ---- */
+const referenceContainer = document.getElementById("referenceContainer");
+const referenceImage = document.getElementById("referenceImage");
+const referenceFileInput = document.getElementById("referenceFileInput");
+const referenceBtn = document.getElementById("referenceBtn");
+const referenceToggle = document.getElementById("referenceToggle");
+const referenceControls = document.getElementById("referenceControls");
+const referenceOpacitySlider = document.querySelector(".reference-opacity");
+const referenceScaleSlider = document.querySelector(".reference-scale");
+const referenceRotateSlider = document.querySelector(".reference-rotate");
+const opacityNumber = document.getElementById("opacityNumber");
+const scaleNumber = document.getElementById("scaleNumber");
+const rotateNumber = document.getElementById("rotateNumber");
+let referenceVisible = false;
+let referenceDragging = false;
+let referenceDragOffset = { x: 0, y: 0 };
+let referencePosition = { x: 0, y: 0 };
+let referenceScale = 100;
+let referenceRotation = 0;
+let referenceOpacity = 50;
+let originalImageWidth = 0;
+let originalImageHeight = 0;
+
+function updateReferenceTransform() {
+  referenceWrapper.style.transform = `translate(${referencePosition.x}px, ${referencePosition.y}px) scale(${referenceScale / 100}) rotate(${referenceRotation}deg)`;
+  referenceImage.style.opacity = referenceOpacity / 100;
+  updateHandlePositions();
+}
+
+function updateHandlePositions() {
+  const img = referenceImage;
+  const w = img.offsetWidth;
+  const h = img.offsetHeight;
+
+  const half = 6;
+
+  const positions = {
+    handleRotate: { left: w / 2 - 8, top: -24 },
+    handleNW: { left: -half, top: -half },
+    handleNE: { left: w - half, top: -half },
+    handleSW: { left: -half, top: h - half },
+    handleSE: { left: w - half, top: h - half },
+    handleN: { left: w / 2 - half, top: -half },
+    handleS: { left: w / 2 - half, top: h - half },
+    handleE: { left: w - half, top: h / 2 - half },
+    handleW: { left: -half, top: h / 2 - half },
+  };
+
+  Object.entries(positions).forEach(([id, pos]) => {
+    const handle = document.getElementById(id);
+    if (handle) {
+      handle.style.left = pos.left + "px";
+      handle.style.top = pos.top + "px";
+      handle.style.right = "auto";
+      handle.style.bottom = "auto";
+      handle.style.transform = "none";
+    }
+  });
+}
+
+referenceBtn.addEventListener("click", () => {
+  referenceFileInput.click();
+});
+
+referenceFileInput.addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    referenceImage.src = ev.target.result;
+    referenceImage.onload = () => {
+      originalImageWidth = referenceImage.naturalWidth;
+      originalImageHeight = referenceImage.naturalHeight;
+      referenceContainer.classList.add("visible");
+      referenceBtn.style.display = "none";
+      referenceToggle.style.display = "block";
+      referenceControls.style.display = "flex";
+      referenceVisible = true;
+      referencePosition = { x: 0, y: 0 };
+      referenceScale = 100;
+      referenceRotation = 0;
+      referenceOpacity = 50;
+      referenceOpacitySlider.value = 50;
+      referenceScaleSlider.value = 100;
+      referenceRotateSlider.value = 0;
+      updateReferenceTransform();
+      requestAnimationFrame(() => updateHandlePositions());
+      saveReference();
+    };
+  };
+  reader.readAsDataURL(file);
+});
+
+referenceToggle.addEventListener("click", () => {
+  referenceVisible = !referenceVisible;
+  if (referenceVisible) {
+    referenceContainer.classList.add("visible");
+    referenceBtn.style.display = "none";
+    referenceToggle.textContent = "Скрыть";
+  } else {
+    referenceContainer.classList.remove("visible");
+    referenceBtn.style.display = "block";
+    referenceToggle.textContent = "Показать";
+  }
+});
+
+/* ---- Reference Front/Back Toggle ---- */
+let referenceOnFront = false;
+const referenceFrontBtn = document.getElementById("referenceFrontBtn");
+
+referenceFrontBtn.addEventListener("click", () => {
+  referenceOnFront = !referenceOnFront;
+  if (referenceOnFront) {
+    referenceContainer.style.zIndex = 20;
+    referenceContainer.style.pointerEvents = "auto";
+    referenceFrontBtn.textContent = "Выключить";
+    referenceFrontBtn.classList.add("active");
+  } else {
+    referenceContainer.style.zIndex = 5;
+    referenceContainer.style.pointerEvents = "none";
+    referenceFrontBtn.textContent = "Включить";
+    referenceFrontBtn.classList.remove("active");
+  }
+});
+
+referenceOpacitySlider.addEventListener("input", () => {
+  referenceOpacity = parseInt(referenceOpacitySlider.value, 10);
+  opacityNumber.value = referenceOpacity;
+  updateReferenceTransform();
+  saveReference();
+});
+
+referenceScaleSlider.addEventListener("input", () => {
+  referenceScale = parseInt(referenceScaleSlider.value, 10);
+  scaleNumber.value = referenceScale;
+  updateReferenceTransform();
+  saveReference();
+});
+
+referenceRotateSlider.addEventListener("input", () => {
+  referenceRotation = parseInt(referenceRotateSlider.value, 10);
+  rotateNumber.value = referenceRotation;
+  updateReferenceTransform();
+  saveReference();
+});
+
+/* Number inputs */
+opacityNumber.addEventListener("change", () => {
+  referenceOpacity = Math.max(0, Math.min(100, parseInt(opacityNumber.value, 10) || 0));
+  referenceOpacitySlider.value = referenceOpacity;
+  updateReferenceTransform();
+  saveReference();
+});
+
+scaleNumber.addEventListener("change", () => {
+  referenceScale = Math.max(10, Math.min(300, parseInt(scaleNumber.value, 10) || 100));
+  referenceScaleSlider.value = referenceScale;
+  updateReferenceTransform();
+  saveReference();
+});
+
+rotateNumber.addEventListener("change", () => {
+  referenceRotation = Math.max(-180, Math.min(180, parseInt(rotateNumber.value, 10) || 0));
+  referenceRotateSlider.value = referenceRotation;
+  updateReferenceTransform();
+  saveReference();
+});
+
+/* Drag reference image */
+referenceImage.addEventListener("mousedown", (e) => {
+  if (!referenceVisible) return;
+  e.preventDefault();
+  referenceContainer.style.zIndex = 20;
+  referenceDragging = true;
+  const rect = referenceContainer.getBoundingClientRect();
+  referenceDragOffset.x = e.clientX - rect.left - referencePosition.x;
+  referenceDragOffset.y = e.clientY - rect.top - referencePosition.y;
+  referenceImage.style.cursor = "grabbing";
+});
+
+/* Prevent native drag */
+referenceImage.addEventListener("dragstart", (e) => e.preventDefault());
+
+/* ---- Resize/Rotate Handles ---- */
+const referenceWrapper = document.getElementById("referenceWrapper");
+const handleRotate = document.getElementById("handleRotate");
+const handleNW = document.getElementById("handleNW");
+const handleNE = document.getElementById("handleNE");
+const handleSW = document.getElementById("handleSW");
+const handleSE = document.getElementById("handleSE");
+const handleN = document.getElementById("handleN");
+const handleS = document.getElementById("handleS");
+const handleE = document.getElementById("handleE");
+const handleW = document.getElementById("handleW");
+
+let referenceResizing = false;
+let referenceRotating = false;
+let referenceResizeHandle = "";
+
+/* Resize start state */
+let resizeStart = {
+  mouseX: 0,
+  mouseY: 0,
+  width: 0,
+  height: 0,
+  posX: 0,
+  posY: 0,
+  rotation: 0,
+};
+
+/* Rotate start state */
+let rotateStart = {
+  centerX: 0,
+  centerY: 0,
+  startAngle: 0,
+  startRotation: 0,
+};
+
+/* ---- ROTATE ---- */
+handleRotate.addEventListener("mousedown", (e) => {
+  if (!referenceVisible) return;
+  e.preventDefault();
+  e.stopPropagation();
+  referenceRotating = true;
+  const rect = referenceImage.getBoundingClientRect();
+  rotateStart.centerX = rect.left + rect.width / 2;
+  rotateStart.centerY = rect.top + rect.height / 2;
+  rotateStart.startAngle = Math.atan2(e.clientY - rotateStart.centerY, e.clientX - rotateStart.centerX) * (180 / Math.PI);
+  rotateStart.startRotation = referenceRotation;
+});
+
+/* ---- RESIZE ---- */
+function getRenderedSize() {
+  const rect = referenceImage.getBoundingClientRect();
+  return {
+    width: rect.width,
+    height: rect.height,
+  };
+}
+
+function resizeFromHandle(handle, mouseX, mouseY, event) {
+  const angleRad = resizeStart.rotation * (Math.PI / 180);
+  const cosA = Math.cos(-angleRad);
+  const sinA = Math.sin(-angleRad);
+
+  const dx = mouseX - resizeStart.mouseX;
+  const dy = mouseY - resizeStart.mouseY;
+
+  // 1. Движение мыши в локальных координатах картинки
+  const localDx = dx * cosA - dy * sinA;
+  const localDy = dx * sinA + dy * cosA;
+
+  const w0 = resizeStart.w0;
+  const h0 = resizeStart.h0;
+  const startScale = resizeStart.scale / 100;
+
+  const startW = w0 * startScale;
+  const startH = h0 * startScale;
+
+  let newW = startW;
+  let newH = startH;
+
+  // 2. Вычисляем новые размеры (привязка 1 в 1 к мыши)
+  if (handle.includes("E")) newW = startW + localDx;
+  if (handle.includes("W")) newW = startW - localDx;
+  if (handle.includes("S")) newH = startH + localDy;
+  if (handle.includes("N")) newH = startH - localDy;
+
+  newW = Math.max(20, newW);
+  newH = Math.max(20, newH);
+
+  // Пропорции с Shift
+  if (event && event.shiftKey && handle.length === 2) {
+    const ratio = w0 / h0;
+    if (newW / newH > ratio) newH = newW / ratio;
+    else newW = newH * ratio;
+  }
+
+  // 3. Новый масштаб в процентах
+  let newScalePercent = (newW / w0) * 100;
+  if (handle === "N" || handle === "S") {
+    newScalePercent = (newH / h0) * 100;
+  }
+
+  // Ограничиваем масштаб от 10% до 300%
+  newScalePercent = Math.max(10, Math.min(300, newScalePercent));
+  newScalePercent = Math.round(newScalePercent);
+  const newScale = newScalePercent / 100;
+
+  // 4. Считаем финальные размеры с учетом ограничений
+  const finalW = w0 * newScale;
+  const finalH = h0 * newScale;
+
+  // 5. Насколько изменился размер?
+  const deltaW = finalW - startW;
+  const deltaH = finalH - startH;
+
+  // 6. Сдвиг центра ВСЕГДА равен половине изменения размера!
+  let shiftLocalX = 0;
+  let shiftLocalY = 0;
+
+  if (handle.includes("E")) shiftLocalX = deltaW / 2;
+  if (handle.includes("W")) shiftLocalX = -deltaW / 2;
+  if (handle.includes("S")) shiftLocalY = deltaH / 2;
+  if (handle.includes("N")) shiftLocalY = -deltaH / 2;
+
+  // 7. Поворачиваем этот сдвиг обратно в глобальные координаты
+  const cosR = Math.cos(angleRad);
+  const sinR = Math.sin(angleRad);
+  const globalShiftX = shiftLocalX * cosR - shiftLocalY * sinR;
+  const globalShiftY = shiftLocalX * sinR + shiftLocalY * cosR;
+
+  // 8. Применяем изменения
+  referencePosition.x = resizeStart.posX + globalShiftX;
+  referencePosition.y = resizeStart.posY + globalShiftY;
+
+  referenceScale = newScalePercent;
+  referenceScaleSlider.value = referenceScale;
+  scaleNumber.value = Math.round(referenceScale);
+
+  updateReferenceTransform();
+}
+
+[handleNW, handleNE, handleSW, handleSE, handleN, handleS, handleE, handleW].forEach((handle) => {
+  handle.addEventListener("mousedown", (e) => {
+    if (!referenceVisible) return;
+    e.preventDefault();
+    e.stopPropagation();
+    referenceResizing = true;
+    referenceResizeHandle = handle.id.replace("handle", "");
+    resizeStart = {
+      mouseX: e.clientX,
+      mouseY: e.clientY,
+      scale: referenceScale,
+      posX: referencePosition.x,
+      posY: referencePosition.y,
+      rotation: referenceRotation,
+      w0: referenceImage.offsetWidth,
+      h0: referenceImage.offsetHeight,
+    };
+  });
+});
+
+/* ---- GLOBAL mousemove ---- */
+document.addEventListener("mousemove", (e) => {
+  /* Rotation */
+  if (referenceRotating) {
+    const currentAngle = Math.atan2(e.clientY - rotateStart.centerY, e.clientX - rotateStart.centerX) * (180 / Math.PI);
+    const delta = currentAngle - rotateStart.startAngle;
+    referenceRotation = Math.max(-180, Math.min(180, rotateStart.startRotation + delta));
+    referenceRotateSlider.value = referenceRotation;
+    rotateNumber.value = Math.round(referenceRotation);
+    updateReferenceTransform();
+    saveReference();
+    return;
+  }
+
+  /* Resize */
+  if (referenceResizing) {
+    resizeFromHandle(referenceResizeHandle, e.clientX, e.clientY, e);
+    return;
+  }
+
+  /* Drag */
+  if (referenceDragging) {
+    e.preventDefault();
+    const rect = referenceContainer.getBoundingClientRect();
+    referencePosition.x = e.clientX - rect.left - referenceDragOffset.x;
+    referencePosition.y = e.clientY - rect.top - referenceDragOffset.y;
+    updateReferenceTransform();
+    saveReference();
+  }
+});
+
+/* ---- GLOBAL mouseup ---- */
+document.addEventListener("mouseup", () => {
+  referenceRotating = false;
+  referenceResizing = false;
+  referenceDragging = false;
+  referenceContainer.style.zIndex = 5;
+  referenceImage.style.cursor = "move";
+});
+
+/* ---- Load reference on start ---- */
+loadReference();

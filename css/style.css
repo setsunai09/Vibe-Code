@@ -51,6 +51,7 @@ body {
   width: 200px;
   min-width: 200px;
   max-width: 200px;
+  height: 100%;
   background: #fff;
   border-radius: 20px;
   padding: 20px 16px;
@@ -293,6 +294,78 @@ body {
   border-color: #f8a4b8;
 }
 
+/* ===== Reference Controls ===== */
+.reference-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.reference-control {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.reference-label {
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: #d4728c;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.reference-controls input[type="range"] {
+  width: 100%;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 5px;
+  border-radius: 3px;
+  background: #fce4ec;
+  cursor: pointer;
+}
+
+.reference-controls input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #f8a4b8;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+}
+
+.reference-controls input[type="range"]::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #f8a4b8;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+}
+
+.reference-number {
+  width: 100%;
+  padding: 4px 6px;
+  border: 2px solid #fce4ec;
+  border-radius: 8px;
+  font-family: "Nunito", sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #8b5e7b;
+  background: #fff;
+  text-align: center;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.reference-number:focus {
+  border-color: #f8a4b8;
+}
+
 /* ===== Action Buttons ===== */
 .action-btn {
   font-family: "Nunito", sans-serif;
@@ -304,6 +377,19 @@ body {
   cursor: pointer;
   transition: all 0.15s ease;
   color: #fff;
+}
+
+.action-btn--reference {
+  background-color: #d4a0b9;
+}
+
+.action-btn--reference:hover {
+  background-color: #c490a9;
+  border-color: #c490a9;
+}
+
+.action-btn--reference.active {
+  background-color: #85cd8a;
 }
 
 .action-btn--clear {
@@ -348,6 +434,111 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+}
+
+.reference-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.reference-container.visible {
+  display: flex;
+}
+
+.reference-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.reference-image {
+  max-width: 80%;
+  max-height: 80%;
+  object-fit: contain;
+  pointer-events: auto;
+  cursor: move;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+/* Resize/Rotate Handles */
+.reference-handle {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: #f8a4b8;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  z-index: 20;
+  pointer-events: auto;
+}
+
+.reference-handle--rotate {
+  top: -24px;
+  left: 50%;
+  cursor: grab;
+  width: 16px;
+  height: 16px;
+  background: #d4728c;
+}
+
+.reference-handle--nw {
+  top: -6px;
+  left: -6px;
+  cursor: nwse-resize;
+}
+
+.reference-handle--ne {
+  top: -6px;
+  right: -6px;
+  cursor: nesw-resize;
+}
+
+.reference-handle--sw {
+  bottom: -6px;
+  left: -6px;
+  cursor: nesw-resize;
+}
+
+.reference-handle--se {
+  bottom: -6px;
+  right: -6px;
+  cursor: nwse-resize;
+}
+
+.reference-handle--n {
+  top: -6px;
+  left: 50%;
+  cursor: ns-resize;
+}
+
+.reference-handle--s {
+  bottom: -6px;
+  left: 50%;
+  cursor: ns-resize;
+}
+
+.reference-handle--e {
+  top: 50%;
+  right: -6px;
+  cursor: ew-resize;
+}
+
+.reference-handle--w {
+  top: 50%;
+  left: -6px;
+  cursor: ew-resize;
 }
 
 #drawingCanvas {
@@ -356,4 +547,6 @@ body {
   border-radius: 12px;
   cursor: crosshair;
   box-shadow: 0 8px 32px rgba(219, 112, 147, 0.1);
+  position: relative;
+  z-index: 10;
 }

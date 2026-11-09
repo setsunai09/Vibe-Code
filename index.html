@@ -52,6 +52,33 @@
       </div>
 
       <div class="toolbar__section">
+        <h3 class="toolbar__label">Изображение</h3>
+        <button class="action-btn action-btn--reference" id="referenceBtn">Загрузить</button>
+        <button class="action-btn action-btn--reference" id="referenceToggle" style="display:none">Скрыть</button>
+        <div class="reference-controls" id="referenceControls" style="display:none">
+          <div class="reference-control">
+            <label class="reference-label">Прозрачность</label>
+            <input type="range" class="reference-opacity" min="0" max="100" value="50">
+            <input type="number" class="reference-number" id="opacityNumber" min="0" max="100" value="50">
+          </div>
+          <div class="reference-control">
+            <label class="reference-label">Размер</label>
+            <input type="range" class="reference-scale" min="10" max="300" value="100">
+            <input type="number" class="reference-number" id="scaleNumber" min="10" max="300" value="100">
+          </div>
+          <div class="reference-control">
+            <label class="reference-label">Поворот</label>
+            <input type="range" class="reference-rotate" min="-180" max="180" value="0">
+            <input type="number" class="reference-number" id="rotateNumber" min="-180" max="180" value="0">
+          </div>
+          <div class="reference-control">
+            <label class="reference-label">Поверх холста</label>
+            <button class="action-btn action-btn--reference" id="referenceFrontBtn">Включить</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="toolbar__section">
         <h3 class="toolbar__label">Цвет</h3>
         <div class="color-picker-wrapper" id="colorPickerWrapper">
           <div class="color-preview" id="colorPreview">
@@ -90,7 +117,22 @@
     </aside>
 
     <main class="canvas-area">
+      <div class="reference-container" id="referenceContainer">
+        <div class="reference-wrapper" id="referenceWrapper">
+          <img class="reference-image" id="referenceImage" src="" alt="Референс">
+          <div class="reference-handle reference-handle--rotate" id="handleRotate"></div>
+          <div class="reference-handle reference-handle--nw" id="handleNW"></div>
+          <div class="reference-handle reference-handle--ne" id="handleNE"></div>
+          <div class="reference-handle reference-handle--sw" id="handleSW"></div>
+          <div class="reference-handle reference-handle--se" id="handleSE"></div>
+          <div class="reference-handle reference-handle--n" id="handleN"></div>
+          <div class="reference-handle reference-handle--s" id="handleS"></div>
+          <div class="reference-handle reference-handle--e" id="handleE"></div>
+          <div class="reference-handle reference-handle--w" id="handleW"></div>
+        </div>
+      </div>
       <canvas id="drawingCanvas"></canvas>
+      <input type="file" id="referenceFileInput" accept="image/*" style="display:none">
     </main>
   </div>
 
