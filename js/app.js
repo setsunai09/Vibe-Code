@@ -18,6 +18,10 @@ let history = [];
 let redoStack = [];
 const MAX_HISTORY = 30;
 let recentColors = [];
+let zoomLevel = 1;
+const MIN_ZOOM = 0.25;
+const MAX_ZOOM = 5;
+const ZOOM_STEP = 0.1;
 
 /* ---- Canvas setup ---- */
 canvas.width = CANVAS_DISPLAY_SIZE;
@@ -28,6 +32,28 @@ canvas.style.height = CANVAS_DISPLAY_SIZE + "px";
 /* ---- White background ---- */
 ctx.fillStyle = "#FFFFFF";
 ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+/* ---- Zoom ---- */
+function applyZoom() {
+  canvas.style.transform = `scale(${zoomLevel})`;
+  canvas.style.transformOrigin = "center center";
+  canvas.style.transition = "transform 0.1s ease";
+}
+
+/* ---- Mouse Wheel Zoom ---- */
+const canvasArea = document.querySelector(".canvas-area");
+
+canvasArea.addEventListener("wheel", (e) => {
+  if (!e.ctrlKey) return;
+  e.preventDefault();
+
+  if (e.deltaY < 0) {
+    zoomLevel = Math.min(MAX_ZOOM, zoomLevel + ZOOM_STEP);
+  } else {
+    zoomLevel = Math.max(MIN_ZOOM, zoomLevel - ZOOM_STEP);
+  }
+  applyZoom();
+}, { passive: false });
 
 /* ---- Grid snapping ---- */
 function snapToGrid(x, y) {
@@ -158,8 +184,8 @@ function startDraw(e) {
   drawing = true;
   saveState();
   const rect = canvas.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const y = e.clientY - rect.top;
+  const x = (e.clientX - rect.left) / zoomLevel;
+  const y = (e.clientY - rect.top) / zoomLevel;
   const cell = snapToGrid(x, y);
   drawBrushAt(cell.x, cell.y);
   lastGridX = cell.x;
@@ -175,8 +201,8 @@ function draw(e) {
   if (!drawing || currentTool === "fill") return;
 
   const rect = canvas.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const y = e.clientY - rect.top;
+  const x = (e.clientX - rect.left) / zoomLevel;
+  const y = (e.clientY - rect.top) / zoomLevel;
   const cell = snapToGrid(x, y);
 
   if (cell.x !== lastGridX || cell.y !== lastGridY) {
@@ -538,8 +564,8 @@ canvas.addEventListener("click", (e) => {
   if (currentTool !== "picker") return;
 
   const rect = canvas.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const y = e.clientY - rect.top;
+  const x = (e.clientX - rect.left) / zoomLevel;
+  const y = (e.clientY - rect.top) / zoomLevel;
   const pixel = ctx.getImageData(Math.floor(x), Math.floor(y), 1, 1).data;
   const hex = "#" + [pixel[0], pixel[1], pixel[2]].map((c) => c.toString(16).padStart(2, "0")).join("");
   setColor(hex);
@@ -725,8 +751,8 @@ canvas.addEventListener("click", (e) => {
 
   saveState();
   const rect = canvas.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const y = e.clientY - rect.top;
+  const x = (e.clientX - rect.left) / zoomLevel;
+  const y = (e.clientY - rect.top) / zoomLevel;
   const cell = snapToGrid(x, y);
   floodFill(cell.x, cell.y);
   saveCanvas();
@@ -1135,3 +1161,6 @@ document.addEventListener("mouseup", () => {
 
 /* ---- Load reference on start ---- */
 loadReference();
+
+/* ---- Apply initial zoom ---- */
+applyZoom();
