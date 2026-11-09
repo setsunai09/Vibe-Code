@@ -684,12 +684,33 @@ document.getElementById("clearBtn").addEventListener("click", () => {
   localStorage.removeItem("pixelArtReference");
 });
 
-/* ---- Download ---- */
+/* ---- Download Modal ---- */
+const downloadModal = document.getElementById("downloadModal");
+const downloadCancel = document.getElementById("downloadCancel");
+const downloadConfirm = document.getElementById("downloadConfirm");
+const downloadResText = document.getElementById("downloadResText");
+
 document.getElementById("downloadBtn").addEventListener("click", () => {
+  downloadResText.textContent = `${resolution}×${resolution}`;
+  downloadModal.classList.add("open");
+});
+
+downloadCancel.addEventListener("click", () => {
+  downloadModal.classList.remove("open");
+});
+
+downloadModal.addEventListener("click", (e) => {
+  if (e.target === downloadModal) {
+    downloadModal.classList.remove("open");
+  }
+});
+
+downloadConfirm.addEventListener("click", () => {
   const link = document.createElement("a");
   link.download = "pixel-art.png";
   link.href = canvas.toDataURL("image/png");
   link.click();
+  downloadModal.classList.remove("open");
 });
 
 /* ---- Mouse Events ---- */
